@@ -1,0 +1,35 @@
+\newcommand{\sumDV}{\sum \mset{ x \mid \langle x, y \rangle \in^{2} D \cap V }}
+\newcommand{\sumDH}{\sum \mset{ x \mid \langle x, y \rangle \in^{2} D \cap H }}
+\newcommand{\sumtotal}{\sum \mset{ x \mid \langle x, y \rangle \in 0..9 \times 0..9 }}
+
+\begin{tabular}{|p{8cm}|p{6cm}|}
+    \hline
+    \textbf{Proposition} & \textbf{Explanation} \\
+    \hline
+    $\abs D = 50$ &
+        Our board's size is 100, and every element is a set of size 2, hence: 50 tiles \\
+    \hline
+    $(D \cap H) \cup (D \cap V) = D$ &
+        By $D \subseteq H \cup V$ \\
+    \hline
+    $(D \cap H) \cap (D \cap V) = \varnothing$ &
+        Because $H$ and $V$ are disjoint! \\
+    \hline
+    $|D \cap H| = |D \cap V| = 25$ &
+        By the assumption, and by previous two conjectures \\
+    \hline
+    $\sumDV$ is even &
+        Every number in the sum appears twice, as the $x$'s of a tile's cells are equal! \\
+    \hline
+    $\sumDH$ is odd &
+        Here every number appears with its successor by similar reasoning \\
+    \hline
+    $\sumtotal$ is even &
+        By decide \\
+    \hline
+    $\sumtotal = \sumDV + \sumDH$ &
+        todo \\
+    \hline
+    Contradiction & todo \\
+    \hline
+\end{tabular}

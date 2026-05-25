@@ -1,16 +1,23 @@
 \documentclass{article}
 
 \usepackage[a4paper,total={6in, 10in}]{geometry}
-\usepackage{xcolor}
 \usepackage[fontsize=14pt]{fontsize}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{xcolor}
 
 \begin{document}
 
 \title{Research Proposal}
-\author{Jonathan Reicher \\ Shachar Itzhaki}
+\author{Jonathan Reicher \ \ Shachar Itzhaki}
 \maketitle
 
+\newcommand{\abs}[1]{\left| #1 \right|}
+\newcommand{\code}{\texttt}
+\newcommand{\mset}[1]{\{\!\!\{ #1 \}\!\!\}}
 \newcommand{\todo}[1]{\textcolor{red}{TODO: #1}}
+\newcommand{\tup}[1]{\left\langle #1 \right\rangle}
 \setlength{\parskip}{0.1cm}
 
 \section*{Problem Statement}
@@ -51,7 +58,7 @@ These systems suffer a number of drawbacks: They lack reproducibility, are
 usually based on cloud services, and are not fit with an interactive and
 iterative workflow.
 
-There are also a number of automated proof assistants that can be embedded into
+There are also a number of automated proof machinery that can be embedded into
 Lean, such as Aesop and Grind. These systems work on top of Lean by
 generating parts of a proof that you request.
 This is useful as part of interactive theorem proving, but they do not produce a
@@ -63,15 +70,41 @@ They can work off of a paper, but that requires manual work.
 \section*{Preliminary Work}
 We started from taking a look at a case study example of a proof in Lean.
 
-Can you cover a $10 \times 10$ board with $2 \times 1$ tiles, such that the
-number of horizontal and vertical tiles is the same?
+\begin{center}
+\fbox{
+    \parbox{0.7\textwidth}{
+        Can you cover a $10 \times 10$ board with $1 \times 2$ tiles, such that the
+        number of horizontal and vertical tiles is the same?
+    }
+}
+\end{center}
 
-This file explains Filmus's solution and proof to the puzzle, "pen and paper"
-style. Spoiler: _You can't!_
+\begin{figure}
+    \centering
+    \scalebox{0.8}{\input{conjectures}}
+    \caption{A proof sketch of the problem.}
+\end{figure}
 
-Started from Yuval’s domino example. Tried to encode the domain and the solution
-in LEAN.
-embed proof.md and a matching lean code that we expect
+As it turns out, you can't. One can prove that it is impossible. A short
+intuitive proof can be seen in Figure 1.
+While this proof is readable and correct, and even relatively formal, it does
+not translate well to Lean.
+
+As an example, here is a part of the proof that represents conjecture ???.
+
+One of the challenges in translating a proof to Lean is representation.
+It is often much more idiomatic to use one of many possible representations.
+For something that might fit as a set for a mathematician, in Lean it might be
+better use the \code{Set} type, or the \code{Finset}, or maybe represent it as a
+type, or even a predicate. The most idiomatic choice for representation depends
+on use.
+
+As a proof of concept, we made a tool which compiles inline math in a markdown
+document to Lean code, and uses a static analysis of the document to determine
+which representation to use for each mathematical object.
+The tool we have right now is very basic, and the only possible representations
+are \code{Set} or \code{Finset} for sets, and \code{Multiset} for multisets and
+\code{Prod} for tuples.
 
 \section*{References}
 
