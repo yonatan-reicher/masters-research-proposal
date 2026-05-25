@@ -1,0 +1,52 @@
+\documentclass[12pt]{article}
+
+\usepackage[a4paper,total={6in, 10in}]{geometry}
+\usepackage{xcolor}
+
+\begin{document}
+
+\title{Research Proposal}
+\author{Jonathan Reicher \\ Shachar Itzhaki}
+\maketitle
+
+\newcommand{\todo}[1]{\textcolor{red}{TODO: #1}}
+\setlength{\parskip}{0.1cm}
+
+\section*{Problem Statement}
+In the intersection between the worlds of mathematical theory, formal logic,
+and programming, exists a species of tools called proof assistants.
+These are programming languages, meant not for building software, but for
+building mathematical proofs.
+Proof assistants, contrary to pen and paper, check formalized proofs for
+correctness and soundness.
+These systems have existed for many years, but recently, one in particular has
+been gaining traction.
+
+Lean (\todo{cite?}) is an interactive proof assistant geared for a general math
+audience.
+Two things that make it especially appealing are its large ecosystem and its
+intuitive syntax.
+Despite that, there are some challenging aspects of adopting Lean, and one in
+particular is how complex its semantics and type system are, and how.
+
+We propose building a system that will reduce the friction of using Lean by
+being more ``forgiving'' and less formal. The system will allow users to write
+down proofs in way that humans can read and understand as written, with parts of
+the proof being translated to Lean, to help a user start formalizing their
+proof in Lean.
+This workflow is in accordance to how researchers tend to use Lean, as a formal
+proof in Lean often comes as a supplementary part of a paper proof inside a
+research paper.
+
+\section*{Existing Solutions}
+Mention open ai’s paper that adi sent
+Mention aristotel
+
+\section*{Preliminary Work}
+Started from Yuval’s domino example. Tried to encode the domain and the solution
+in LEAN.
+embed proof.md and a matching lean code that we expect
+
+\section*{References}
+
+\end{document}
