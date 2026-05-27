@@ -1,5 +1,6 @@
 \documentclass{article}
 
+% ------ Packages ------
 \usepackage[a4paper,total={6in, 10in}]{geometry}
 \usepackage[fontsize=14pt]{fontsize}
 \usepackage{amsmath}
@@ -8,18 +9,22 @@
 \usepackage{listings}
 \usepackage{xcolor}
 
-\begin{document}
+% ------ Settings ------
+\setlength{\parskip}{0.1cm}
 
-\title{Research Proposal}
-\author{Jonathan Reicher \ \ Shachar Itzhaki}
-\maketitle
-
+% ------ Commands ------
 \newcommand{\abs}[1]{\left| #1 \right|}
 \newcommand{\code}{\texttt}
 \newcommand{\mset}[1]{\{\!\!\{ #1 \}\!\!\}}
 \newcommand{\todo}[1]{\textcolor{red}{TODO: #1}}
 \newcommand{\tup}[1]{\left\langle #1 \right\rangle}
-\setlength{\parskip}{0.1cm}
+\newcommand{\lean}{\textsc{Lean}}
+
+\begin{document}
+
+\title{Combining the Formal and the Informal}
+\author{Jonathan Reicher \ \ Shachar Itzhaki}
+\maketitle
 
 \section*{Problem Statement}
 In the intersection between the worlds of mathematical theory, formal logic,
@@ -28,45 +33,69 @@ These are programming languages, meant not for building software, but for
 building mathematical proofs.
 Proof assistants, contrary to pen and paper, check formalized proofs for
 correctness and soundness.
-These systems have existed for many years, but recently, one in particular has
-been gaining traction.
 
-Lean (\todo{cite?}) is an interactive proof assistant geared for a general math
-audience.
+These so called proof assistants admit only entirely formalized proofs, where
+every step is fully justified based on a complex logical semantics sitting on
+top of a complex declarative semantics. That is to say, not only are the logical
+steps themselves complex and rigorous, but so is the way you express your proof
+and how the steps are applied.
+
+For many years, proof assistants where a niche, unpopular family of tools, used
+mostly by experts and enthusiasts. However, one member in particular has been
+gaining traction in the mathematical community, bringing many inexperienced
+users to the world of interactive theorem proving.
+
+\lean (\todo{cite?}) is an interactive proof assistant geared towards a general
+math audience.
 Two things that make it especially appealing are its large ecosystem and its
 intuitive syntax.
-Despite that, there are some challenging aspects of adopting Lean, and one in
-particular is how complex its semantics and type system are, and how.
+For example, it has a large library of formalized mathematics called
+\code{mathlib}, which contains many foundational and advanced mathematical
+results and theories, and includes notation familiar to mathematicians.
+Despite that, there are some challenging aspects of adopting \lean, and one in
+particular is how complex its semantics and type system are.
 
-We propose building a system that will reduce the friction of using Lean by
+We propose building a system that will reduce the friction of using \lean by
 being more ``forgiving'' and less formal. The system will allow users to write
 down proofs in way that humans can read and understand as written, with parts of
-the proof being translated to Lean, to help a user start formalizing their
-proof in Lean.
-This workflow is in accordance to how researchers tend to use Lean, as a formal
-proof in Lean often comes as a supplementary part of a paper proof inside a
+the proof being translated to \lean, to help a user start formalizing their
+proof in \lean.
+This workflow is in accordance to how researchers tend to use \lean, as a formal
+proof in \lean often comes as a supplementary part of a paper proof inside a
 research paper.
 
 \section*{Existing Solutions}
-For starting a project in Lean, one can reach for any off-the-shelf
+For starting a new formal proof, one can reach for any off-the-shelf
 generative large language model such as ChatGPT.
-These systems have gotten good at generating good and correct Lean code.
-One can write their paper, give it to the system, and prompt it to generate a
-formal Lean proof.
-There are even tools in place to help large language models work with Lean such
-Aristotle.
-These systems suffer a number of drawbacks: They lack reproducibility, are
-usually based on cloud services, and are not fit with an interactive and
-iterative workflow.
+In an agentic setting, these systems have gotten good at generating idiomatic
+and correct \lean code.
+One can write their paper, provide it to the agent, and prompt it to generate a
+formal \lean proof.
+There are even tools in place to help large language models work with \lean such
+Aristotle (\todo{cite?}).
+These systems suffer a number of drawbacks. To name a few:
+They lack reproducibility,
+are usually based on cloud services,
+and are not fit with an interactive and iterative workflow.
 
 There are also a number of automated proof machinery that can be embedded into
-Lean, such as Aesop and Grind. These systems work on top of Lean by
+\lean, such as Aesop and Grind. These systems work on top of \lean by
 generating parts of a proof that you request.
 This is useful as part of interactive theorem proving, but they do not produce a
 readable proof.
-They can work off of a paper, but that requires manual work.
+Arguably, they can start from an informal proof, if the statement in question is
+formalized as a theorem signature in \lean, with a missing or a partial proof
+body.
 
 \todo{Mention open ai’s paper that adi sent}
+
+\todo{Mention LeanEgg}
+
+\section*{Our Approach}
+We define a language for writing informal proofs, with the formal parts being
+recognized and translated to matching \lean code.
+
+express parts of the proof in formal
 
 \section*{Preliminary Work}
 As a case study, we started by taking a look at the following problem:
@@ -89,21 +118,21 @@ As a case study, we started by taking a look at the following problem:
 As it turns out, you can't. One can prove that it is impossible. A short
 intuitive proof can be seen in Figure 1.
 While this proof is readable and correct, and even relatively formal, it does
-not translate well to Lean.
+not translate well to \lean.
 
 As an example, here is a part of the proof that represents conjecture ???.
 
-One of the challenges in translating a proof to Lean is representation.
+One of the challenges in translating a proof to \lean is representation.
 It is often much more idiomatic to use one of many possible representations.
-For something that might fit as a set for a mathematician, in Lean it might be
+For something that might fit as a set for a mathematician, in \lean it might be
 better use the \code{Set} type, or the \code{Finset}, or maybe represent it as a
 type, or even a predicate. The most idiomatic choice for representation depends
 on use.
 
 As a proof of concept, we made a tool which compiles inline math in a markdown
-document to Lean code, and uses a static analysis of the document to determine
+document to \lean code, and uses a static analysis of the document to determine
 which representation to use for each mathematical object.
-You can invoke the tool interactively inside a Lean document, giving it a
+You can invoke the tool interactively inside a \lean document, giving it a
 markdown document, and it declares variables and definitions which can be used
 from that point on as if they were declared in the file itself directly.
 
@@ -117,11 +146,11 @@ For example, for the following markdown document:
 Let $H = \{ \{ (x, y), (x + 1, y) \} \mid x \in 0..8, y \in
 0..9 \} \}$ be the set of horizontal tiles on the board.
 \end{verbatim}}
-The tool generates the following Lean code:
-\newenvironment{lean}{\ttfamily\small\par\noindent}{\par}
-\begin{lean}
+The tool generates the following \lean code:
+\newenvironment{leancode}{\ttfamily\small\par\noindent}{\par}
+\begin{leancode}
     def H : Set (Fin 10 $\times$ Fin 10) := \{ (x, y) | x $\in$ Finset.range 9, y $\in$ Finset.range 10 \}
-\end{lean}
+\end{leancode}
 The tool is invoked by simply calling the macro \code{define\_latex "foo.md"},
 with the file name of the markdown document as the argument.
 
