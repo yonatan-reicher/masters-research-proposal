@@ -1,8 +1,37 @@
-\newcommand{\sumDV}{\sum \mset{ x \mid \langle x, y \rangle \in^{2} D \cap V }}
-\newcommand{\sumDH}{\sum \mset{ x \mid \langle x, y \rangle \in^{2} D \cap H }}
-\newcommand{\sumtotal}{\sum \mset{ x \mid \langle x, y \rangle \in 0..9 \times 0..9 }}
+{
 
-\begin{tabular}{|p{8cm}|p{6cm}|}
+\let\oldsum\sum
+\renewcommand{\sum}{%
+    \mathop{\scalebox{1.5}{$\displaystyle\oldsum$}}\limits
+}
+
+\newcommand{\sumDwhat}[1]{
+    \sum_{t \in D \cap #1} \sum_{ \tup{x, y} \in t } x
+}
+\newcommand{\sumDV}{\sumDwhat V}
+\newcommand{\sumDH}{\sumDwhat H}
+\newcommand{\sumD}{
+    \sum_{t \in D} \sum_{ \tup{x, y} \in t } x
+}
+
+\begin{tabular}{|p{10cm}|p{8cm}|}
+    \hline
+    \textbf{Assumption} & \textbf{Explanation} \\
+    \hline
+    \hline
+    $
+    H = \set{ \set{ \tup{x, y}, \tup{x + 1, y} } \mid x \in 0..8, y \in 0..9 }
+    $ &
+        Set of possible horizontal tiles \\
+    \hline
+    $
+    V = \set{ \set{ \tup{x, y}, \tup{x, y + 1} } \mid x \in 0..9, y \in 0..8 }
+    $ &
+        Set of possible vertical tiles \\
+    \hline
+    $D \subseteq H \cup V$ is a valid tiling & \\
+    \hline
+    $\abs{D \cap H} = \abs{D \cap V}$ & Assume for contradiction \\
     \hline
     \textbf{Proposition} & \textbf{Explanation} \\
     \hline
@@ -13,23 +42,27 @@
         By $D \subseteq H \cup V$ \\
     \hline
     $(D \cap H) \cap (D \cap V) = \varnothing$ &
-        Because $H$ and $V$ are disjoint! \\
+        Because $H$ and $V$ are disjoint \\
     \hline
     $|D \cap H| = |D \cap V| = 25$ &
         By the assumption, and by previous two conjectures \\
     \hline
     $\sumDV$ is even &
-        Every number in the sum appears twice, as the $x$'s of a tile's cells are equal! \\
+        Every number in the sum appears twice, as the $x$'s of a tile's cells are equal \\
     \hline
     $\sumDH$ is odd &
         Here every number appears with its successor by similar reasoning \\
     \hline
-    $\sumtotal$ is even &
-        By decide \\
+    $\sumD$ is even &
+        By calculation \\
     \hline
-    $\sumtotal = \sumDV + \sumDH$ &
-        todo \\
+    $\sumD = \sumDV + \sumDH$ &
+        By $(D \cap H) \cup (D \cap V) = D$ and $(D \cap H) \cap (D \cap V) =
+        \varnothing$ \\
     \hline
-    Contradiction & todo \\
+    Contradiction & In the previous proposition, the left-hand side is even
+    while the right-hand side is odd \\
     \hline
 \end{tabular}
+
+}

@@ -8,6 +8,7 @@
 \usepackage{graphicx}
 \usepackage{listings}
 \usepackage{xcolor}
+\usepackage{xspace}
 
 % ------ Settings ------
 \setlength{\parskip}{0.1cm}
@@ -16,9 +17,15 @@
 \newcommand{\abs}[1]{\left| #1 \right|}
 \newcommand{\code}{\texttt}
 \newcommand{\mset}[1]{\{\!\!\{ #1 \}\!\!\}}
+\newcommand{\set}[1]{\left\{ #1 \right\}}
 \newcommand{\todo}[1]{\textcolor{red}{TODO: #1}}
 \newcommand{\tup}[1]{\left\langle #1 \right\rangle}
-\newcommand{\lean}{\textsc{Lean}}
+% Names
+\newcommand{\lean}{\textsc{Lean}\xspace}
+\newcommand{\mathlib}{\code{Mathlib}\xspace}
+
+\let\oldsection\section
+\renewcommand{\section}[1]{\oldsection*{\normalsize#1}\vspace{-0.5em}}
 
 \begin{document}
 
@@ -26,7 +33,7 @@
 \author{Jonathan Reicher \ \ Shachar Itzhaki}
 \maketitle
 
-\section*{Problem Statement}
+\section{Problem Statement}
 In the intersection between the worlds of mathematical theory, formal logic,
 and programming, exists a species of tools called proof assistants.
 These are programming languages, meant not for building software, but for
@@ -40,31 +47,22 @@ top of a complex declarative semantics. That is to say, not only are the logical
 steps themselves complex and rigorous, but so is the way you express your proof
 and how the steps are applied.
 
-For many years, proof assistants where a niche, unpopular family of tools, used
-mostly by experts and enthusiasts. However, one member in particular has been
-gaining traction in the mathematical community, bringing many inexperienced
-users to the world of interactive theorem proving.
+For many years, proof assistants were a niche, unpopular family of tools, used
+mostly by experts and enthusiasts. However, one member of that family in
+particular has been gaining traction in the mathematical community, bringing
+many inexperienced users to the world of interactive theorem proving.
 
 \lean (\todo{cite?}) is an interactive proof assistant geared towards a general
 math audience.
 Two things that make it especially appealing are its large ecosystem and its
 intuitive syntax.
 For example, it has a large library of formalized mathematics called
-\code{mathlib}, which contains many foundational and advanced mathematical
+\mathlib, which contains many foundational and advanced mathematical
 results and theories, and includes notation familiar to mathematicians.
 Despite that, there are some challenging aspects of adopting \lean, and one in
 particular is how complex its semantics and type system are.
 
-We propose building a system that will reduce the friction of using \lean by
-being more ``forgiving'' and less formal. The system will allow users to write
-down proofs in way that humans can read and understand as written, with parts of
-the proof being translated to \lean, to help a user start formalizing their
-proof in \lean.
-This workflow is in accordance to how researchers tend to use \lean, as a formal
-proof in \lean often comes as a supplementary part of a paper proof inside a
-research paper.
-
-\section*{Existing Solutions}
+\section{Existing Solutions}
 For starting a new formal proof, one can reach for any off-the-shelf
 generative large language model such as ChatGPT.
 In an agentic setting, these systems have gotten good at generating idiomatic
@@ -91,13 +89,21 @@ body.
 
 \todo{Mention LeanEgg}
 
-\section*{Our Approach}
-We define a language for writing informal proofs, with the formal parts being
-recognized and translated to matching \lean code.
+\section{Our Approach}
+We define a language for writing informal proofs that can be partially
+translated to \lean, to help with starting a formal proof.
+The language is a modification of markdown, with some syntax constructs being
+recognized as formal. All parts are readable as they are written.
+The language can be interfaced via \lean directly by a macro,
+and can access \lean and \mathlib symbols.
+It is meant as a way to write an informal proof to be understood, and a formal
+proof to be checked.
 
-express parts of the proof in formal
+This workflow is in accordance to how researchers tend to use \lean, as a formal
+proof in \lean often comes as a supplementary part of a paper proof inside a
+research paper.
 
-\section*{Preliminary Work}
+\section{Preliminary Work}
 As a case study, we started by taking a look at the following problem:
 
 \begin{center}
@@ -149,11 +155,12 @@ Let $H = \{ \{ (x, y), (x + 1, y) \} \mid x \in 0..8, y \in
 The tool generates the following \lean code:
 \newenvironment{leancode}{\ttfamily\small\par\noindent}{\par}
 \begin{leancode}
-    def H : Set (Fin 10 $\times$ Fin 10) := \{ (x, y) | x $\in$ Finset.range 9, y $\in$ Finset.range 10 \}
+    def H : Set (Fin 10 $\times$ Fin 10) := \{ (x, y) | (x $\in$ Finset.range 9) (y $\in$ Finset.range 10) \}
 \end{leancode}
-The tool is invoked by simply calling the macro \code{define\_latex "foo.md"},
-with the file name of the markdown document as the argument.
+The tool is invoked by simply calling the macro \code{define\_latex file "foo.md"},
+with \code{foo.md} replaced with the file name of the markdown document of your
+choice. It is also possible to use \code{define\_latex "Hello $x=world$"}.
 
-\section*{References}
+\section{References}
 
 \end{document}
