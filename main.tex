@@ -5,6 +5,7 @@
 \usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage{graphicx}
+\usepackage{listings}
 \usepackage{xcolor}
 
 \begin{document}
@@ -68,7 +69,7 @@ They can work off of a paper, but that requires manual work.
 \todo{Mention open ai’s paper that adi sent}
 
 \section*{Preliminary Work}
-We started by taking a look at a case study example of a proof in Lean.
+As a case study, we started by taking a look at the following problem:
 
 \begin{center}
 \fbox{
@@ -102,9 +103,27 @@ on use.
 As a proof of concept, we made a tool which compiles inline math in a markdown
 document to Lean code, and uses a static analysis of the document to determine
 which representation to use for each mathematical object.
+You can invoke the tool interactively inside a Lean document, giving it a
+markdown document, and it declares variables and definitions which can be used
+from that point on as if they were declared in the file itself directly.
+
 The tool we have right now is very basic, and the only possible representations
 are \code{Set} or \code{Finset} for sets, and \code{Multiset} for multisets and
 \code{Prod} for tuples.
+
+\paragraph{Example}
+For example, for the following markdown document:
+{\small\begin{verbatim}
+Let $H = \{ \{ (x, y), (x + 1, y) \} \mid x \in 0..8, y \in
+0..9 \} \}$ be the set of horizontal tiles on the board.
+\end{verbatim}}
+The tool generates the following Lean code:
+\newenvironment{lean}{\ttfamily\small\par\noindent}{\par}
+\begin{lean}
+    def H : Set (Fin 10 $\times$ Fin 10) := \{ (x, y) | x $\in$ Finset.range 9, y $\in$ Finset.range 10 \}
+\end{lean}
+The tool is invoked by simply calling the macro \code{define\_latex "foo.md"},
+with the file name of the markdown document as the argument.
 
 \section*{References}
 
