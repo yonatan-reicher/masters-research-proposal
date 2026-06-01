@@ -21,8 +21,14 @@
 \newcommand{\todo}[1]{\textcolor{red}{TODO: #1}}
 \newcommand{\tup}[1]{\left\langle #1 \right\rangle}
 % Names
-\newcommand{\lean}{\textsc{Lean}\xspace}
 \newcommand{\mathlib}{\code{Mathlib}\xspace}
+\newcommand{\newname}[2]{\newcommand{#1}{\textsc{#2}\xspace}}
+\newname{\aesop}{Aesop}
+\newname{\aristotle}{Aristotle}
+\newname{\chatgpt}{ChatGPT}
+\newname{\grind}{Grind}
+\newname{\leanegg}{LeanEgg}
+\newname{\lean}{Lean}
 
 \let\oldsection\section
 \renewcommand{\section}[1]{\oldsection*{\normalsize#1}\vspace{-0.5em}}
@@ -63,31 +69,37 @@ Despite that, there are some challenging aspects of adopting \lean, and one in
 particular is how complex its semantics and type system are.
 
 \section{Existing Solutions}
-For starting a new formal proof, one can reach for any off-the-shelf
-generative large language model such as ChatGPT.
+When first wanting to formalize a proof in \lean, one usually takes human
+mathematicians and sends them to learn the language, and write their proof. This
+solution comes with the obvious drawback of being slow, requiring a lot of human
+time and effort. \lean has a steep learning curve, and it can take months to
+learn the basics.
+
+A more automated approach is to formalize just the theorems and definitions, and
+then use an automated theorem prover to fill in the gaps. Several such tools
+exist, such as \aesop, \grind, and \leanegg (\todo{cite..?}).
+These tools complete a theorem, or part of a theorem, using various heuristics
+and algorithms.
+They tend to be integrated into \lean, and more fit to use as part of
+interactive proof development, rather than full automation.
+Moreover, they tend to work only on simple theorems, fail without human guidance,
+and even when they succeed, they do not produce readable a proof.
+
+For a more wholistic approach for formalizing a proof, one can reach for any
+off-the-shelf generative large language model such as \chatgpt.
 In an agentic setting, these systems have gotten good at generating idiomatic
 and correct \lean code.
 One can write their paper, provide it to the agent, and prompt it to generate a
 formal \lean proof.
+One can even interact with it to steer towards better directions.
 There are even tools in place to help large language models work with \lean such
-Aristotle (\todo{cite?}).
+\aristotle (\todo{cite?}).
 These systems suffer a number of drawbacks. To name a few:
 They lack reproducibility,
 are usually based on cloud services,
 and are not fit with an interactive and iterative workflow.
 
-There are also a number of automated proof machinery that can be embedded into
-\lean, such as Aesop and Grind. These systems work on top of \lean by
-generating parts of a proof that you request.
-This is useful as part of interactive theorem proving, but they do not produce a
-readable proof.
-Arguably, they can start from an informal proof, if the statement in question is
-formalized as a theorem signature in \lean, with a missing or a partial proof
-body.
-
 \todo{Mention open ai’s paper that adi sent}
-
-\todo{Mention LeanEgg}
 
 \section{Our Approach}
 We define a language for writing informal proofs that can be partially
@@ -102,6 +114,21 @@ proof to be checked.
 This workflow is in accordance to how researchers tend to use \lean, as a formal
 proof in \lean often comes as a supplementary part of a paper proof inside a
 research paper.
+
+\paragraph{Example}
+For example, for the following markdown document:
+{\small\begin{verbatim}
+Let $H = \{ \{ (x, y), (x + 1, y) \} \mid x \in 0..8, y \in
+0..9 \} \}$ be the set of horizontal tiles on the board.
+\end{verbatim}}
+The tool generates the following \lean code:
+\newenvironment{leancode}{\ttfamily\small\par\noindent}{\par}
+\begin{leancode}
+    def H : Set (Fin 10 $\times$ Fin 10) := \{ (x, y) | (x $\in$ Finset.range 9) (y $\in$ Finset.range 10) \}
+\end{leancode}
+The tool is invoked by simply calling the macro \code{define\_latex file "foo.md"},
+with \code{foo.md} replaced with the file name of the markdown document of your
+choice. It is also possible to use \code{define\_latex "Hello $x=world$"}.
 
 \section{Preliminary Work}
 As a case study, we started by taking a look at the following problem:
@@ -146,21 +173,12 @@ The tool we have right now is very basic, and the only possible representations
 are \code{Set} or \code{Finset} for sets, and \code{Multiset} for multisets and
 \code{Prod} for tuples.
 
-\paragraph{Example}
-For example, for the following markdown document:
-{\small\begin{verbatim}
-Let $H = \{ \{ (x, y), (x + 1, y) \} \mid x \in 0..8, y \in
-0..9 \} \}$ be the set of horizontal tiles on the board.
-\end{verbatim}}
-The tool generates the following \lean code:
-\newenvironment{leancode}{\ttfamily\small\par\noindent}{\par}
-\begin{leancode}
-    def H : Set (Fin 10 $\times$ Fin 10) := \{ (x, y) | (x $\in$ Finset.range 9) (y $\in$ Finset.range 10) \}
-\end{leancode}
-The tool is invoked by simply calling the macro \code{define\_latex file "foo.md"},
-with \code{foo.md} replaced with the file name of the markdown document of your
-choice. It is also possible to use \code{define\_latex "Hello $x=world$"}.
-
 \section{References}
 
 \end{document}
+
+
+% TODO:
+% Look into the following
+% - Malinca
+%   - Waterproof
