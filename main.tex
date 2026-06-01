@@ -7,6 +7,7 @@
 \usepackage{amssymb}
 \usepackage{graphicx}
 \usepackage{listings}
+\usepackage{unicode-math}
 \usepackage{xcolor}
 \usepackage{xspace}
 
@@ -20,6 +21,7 @@
 \newcommand{\set}[1]{\left\{ #1 \right\}}
 \newcommand{\todo}[1]{\textcolor{red}{TODO: #1}}
 \newcommand{\tup}[1]{\left\langle #1 \right\rangle}
+\newenvironment{leancode}{\ttfamily\small\par\noindent}{\par}
 % Names
 \newcommand{\mathlib}{\code{Mathlib}\xspace}
 \newcommand{\newname}[2]{\newcommand{#1}{\textsc{#2}\xspace}}
@@ -29,7 +31,7 @@
 \newname{\grind}{Grind}
 \newname{\leanegg}{LeanEgg}
 \newname{\lean}{Lean}
-\newname{\roq}{Roq}
+\newname{\rocq}{Rocq}
 \newname{\waterproof}{Waterproof}
 
 \let\oldsection\section
@@ -102,8 +104,17 @@ are usually based on cloud services,
 and are not fit with an interactive and iterative workflow.
 
 There are also libraries for making proofs easier to read and write. One example
-is \waterproof. This is a library for the \roq proof assistant, which adds
-notation inspired by pen-and-paper proofs. It does require the proof to be
+is \waterproof. This is a library for the \rocq proof assistant, which adds
+notation inspired by pen-and-paper proofs.
+For example, here is a proof written in \waterproof:
+\include{rocq-waterproof-example}
+
+And here is the same proof in \rocq without \waterproof:
+\include{rocq-no-waterproof-example}
+
+% TODO: Move the includes above to figures.
+
+It does require the proof to be
 fully formalized, and informal proofs would require major work to be adapted to
 \waterproof.
 
@@ -130,7 +141,6 @@ Let $H = \{ \{ (x, y), (x + 1, y) \} \mid x \in 0..8, y \in
 0..9 \} \}$ be the set of horizontal tiles on the board.
 \end{verbatim}}
 The tool generates the following \lean code:
-\newenvironment{leancode}{\ttfamily\small\par\noindent}{\par}
 \begin{leancode}
     def H : Set (Fin 10 $\times$ Fin 10) := \{ (x, y) | (x $\in$ Finset.range 9) (y $\in$ Finset.range 10) \}
 \end{leancode}
@@ -152,7 +162,7 @@ As a case study, we started by taking a look at the following problem:
 
 \begin{figure}
     \centering
-    \scalebox{0.8}{\input{conjectures}}
+    \scalebox{0.7}{\input{conjectures}}
     \caption{A proof sketch of the problem.}
 \end{figure}
 
@@ -162,6 +172,17 @@ While this proof is readable and correct, and even relatively formal, it does
 not translate well to \lean.
 
 As an example, here is a part of the proof that represents conjecture ???.
+
+\begin{verbatim}
+  lemma disjoint_hvtiles (tiling : DominoTiling n m) :
+    Disjoint (htiles tiling) (vtiles tiling) := by
+    unfold htiles vtiles
+    apply Finset.disjoint_filter_filter'
+    apply Pi.disjoint_iff.mpr
+    intros
+    unfold horizontal vertical
+    split <;> simp
+\end{verbatim}
 
 One of the challenges in translating a proof to \lean is representation.
 It is often much more idiomatic to use one of many possible representations.
@@ -190,3 +211,9 @@ are \code{Set} or \code{Finset} for sets, and \code{Multiset} for multisets and
 % Look into the following
 % - Malinca
 %   - Waterproof
+%     I am trying to install waterproof to try it and to give an example
+%     comparison of a proof in waterproof against one in Rocq.
+%     I am waiting rocq to install, then I can try it with the waterproof
+%     extension in vscode.
+%
+% Write the example proof for the conjecture in the preliminary work section.
