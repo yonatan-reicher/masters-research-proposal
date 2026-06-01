@@ -29,6 +29,8 @@
 \newname{\grind}{Grind}
 \newname{\leanegg}{LeanEgg}
 \newname{\lean}{Lean}
+\newname{\roq}{Roq}
+\newname{\waterproof}{Waterproof}
 
 \let\oldsection\section
 \renewcommand{\section}[1]{\oldsection*{\normalsize#1}\vspace{-0.5em}}
@@ -99,10 +101,16 @@ They lack reproducibility,
 are usually based on cloud services,
 and are not fit with an interactive and iterative workflow.
 
+There are also libraries for making proofs easier to read and write. One example
+is \waterproof. This is a library for the \roq proof assistant, which adds
+notation inspired by pen-and-paper proofs. It does require the proof to be
+fully formalized, and informal proofs would require major work to be adapted to
+\waterproof.
+
 \todo{Mention open ai’s paper that adi sent}
 
 \section{Our Approach}
-We define a language for writing informal proofs that can be partially
+We define a language for writing \emph{informal} proofs that can be partially
 translated to \lean, to help with starting a formal proof.
 The language is a modification of markdown, with some syntax constructs being
 recognized as formal. All parts are readable as they are written.
