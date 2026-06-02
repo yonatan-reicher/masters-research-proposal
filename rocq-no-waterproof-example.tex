@@ -1,3 +1,34 @@
 \begin{leancode}
-    Goal 2 is so stupid.
+% Require Import Reals.
+% Require Import Lra.
+% Open Scope R_scope.
+%
+% Definition interval_half_open (a b : R) (x : R) : Prop :=
+%   a <= x /\ x < b.
+%
+% Definition lower_bound (S : R -> Prop) (l : R) : Prop :=
+%   forall x : R, S x -> l <= x.
+%
+% Definition is_infimum (m : R) (S : R -> Prop) : Prop :=
+%   lower_bound S m /\ forall l : R, lower_bound S l -> l <= m.
+%
+%
+Goal is\_infimum 2 (interval\_half\_open 2 5).                                  \\
+Proof.                                                                          \\
+\tab unfold is\_infimum.                                                        \\
+\tab split.                                                                     \\
+\tab - (* We need to show that 2 is a lower bound for [2, 5) *)                 \\
+\tab \tab unfold lower\_bound.                                                  \\
+\tab \tab intros c Hc.                                                          \\
+\tab \tab destruct Hc as [H2 \_].                                               \\
+\tab \tab exact H2.                                                             \\
+\tab - (* We need to show that any lower bound l is <= 2 *)                     \\
+\tab \tab intros l Hl.                                                          \\
+\tab \tab unfold lower\_bound in Hl.                                            \\
+\tab \tab apply Hl.                                                             \\
+\tab \tab (* Concluding l <= 2 by applying the lower bound to 2 $\in$ [2, 5) *) \\
+\tab \tab split.                                                                \\
+\tab \tab + lra.                                                                \\
+\tab \tab + lra.                                                                \\
+Qed.                                                                            \\
 \end{leancode}

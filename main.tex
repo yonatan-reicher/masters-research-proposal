@@ -21,7 +21,15 @@
 \newcommand{\set}[1]{\left\{ #1 \right\}}
 \newcommand{\todo}[1]{\textcolor{red}{TODO: #1}}
 \newcommand{\tup}[1]{\left\langle #1 \right\rangle}
-\newenvironment{leancode}{\ttfamily\small\par\noindent}{\par}
+\newenvironment{leancode}{
+    \setlength\parindent{0pt}
+    \newcommand{\tab}{\hspace*{0.5cm}}
+    \ttfamily
+    \small
+    \par
+}{
+    \par
+}
 % Names
 \newcommand{\mathlib}{\code{Mathlib}\xspace}
 \newcommand{\newname}[2]{\newcommand{#1}{\textsc{#2}\xspace}}
@@ -106,11 +114,20 @@ and are not fit with an interactive and iterative workflow.
 There are also libraries for making proofs easier to read and write. One example
 is \waterproof. This is a library for the \rocq proof assistant, which adds
 notation inspired by pen-and-paper proofs.
-For example, here is a proof written in \waterproof:
-\include{rocq-waterproof-example}
+An example proof, written with and without \waterproof respectively, can be seen
+in figures \ref{fig:waterproof} and \ref{fig:no-waterproof}.
 
-And here is the same proof in \rocq without \waterproof:
+\begin{figure}
+\include{rocq-waterproof-example}
+\caption{A proof written in \rocq with \waterproof.}
+\label{fig:waterproof}
+\end{figure}
+
+\begin{figure}
 \include{rocq-no-waterproof-example}
+\caption{The same proof, written in \rocq without \waterproof.}
+\label{fig:no-waterproof}
+\end{figure}
 
 % TODO: Move the includes above to figures.
 
@@ -164,14 +181,14 @@ As a case study, we started by taking a look at the following problem:
     \centering
     \scalebox{0.7}{\input{conjectures}}
     \caption{A proof sketch of the problem.}
+    \label{fig:conjectures}
 \end{figure}
 
 As it turns out, you can't. One can prove that it is impossible. A short
-intuitive proof can be seen in Figure 1.
+intuitive proof can be seen in figure \ref{fig:conjectures}.
 While this proof is readable and correct, and even relatively formal, it does
 not translate well to \lean.
-
-As an example, here is a part of the proof that represents conjecture ???.
+As an example, here is a part of the proof that represents conjecture 3.
 
 \begin{verbatim}
   lemma disjoint_hvtiles (tiling : DominoTiling n m) :
