@@ -176,8 +176,10 @@ As a case study, we started by taking a look at the following problem:
 \end{center}
 
 \begin{figure}
-    \centering
-    \scalebox{0.7}{\input{conjectures}}
+    % \centering
+    % This command centers, like \centering, but doesn't break when the figure
+    % is wider than the text width.
+    \makebox[\textwidth][c]{ \scalebox{0.9}{\input{conjectures}} }
     \caption{A proof sketch of the problem.}
     \label{fig:conjectures}
 \end{figure}
