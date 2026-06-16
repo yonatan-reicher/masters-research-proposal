@@ -161,7 +161,8 @@ The tool generates the following \lean code:
 \end{leancode}
 The tool is invoked by simply calling the macro \code{define\_latex file "foo.md"},
 with \code{foo.md} replaced with the file name of the markdown document of your
-choice. It is also possible to use \code{define\_latex "Hello $x=world$"}.
+choice. It is also possible to use the macro with a string literal instead of a
+file by omitting the "file" keyword: \code{define\_latex "Hello \$x=world\$"}.
 
 \section{Preliminary Work}
 As a case study, we started by taking a look at the following problem:
