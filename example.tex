@@ -1,0 +1,12 @@
+\paragraph{Markdown}
+{\small\begin{verbatim}
+Let $H = \{ \{ (x, y), (x + 1, y) \} \mid x \in 0..8, y \in 0..9 \} \}
+$ be the set of horizontal tiles on the board.
+\end{verbatim}}
+
+\paragraph{Lean} \
+\begin{leancode}
+    def H : Set (Fin 10 $\times$ Fin 10) := \{ (x, y) | (x $\in$ Finset.range 9) (y $\in$ Finset.range 10) \}
+\end{leancode}
+
+\vspace{-0.5cm}

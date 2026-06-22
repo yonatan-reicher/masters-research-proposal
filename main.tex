@@ -41,7 +41,7 @@
 \newname{\waterproof}{Waterproof}
 
 \let\oldsection\section
-\renewcommand{\section}[1]{\oldsection*{\normalsize#1}\vspace{-0.5em}}
+\renewcommand{\section}[1]{\oldsection*{\large#1}\vspace{-0.5em}}
 
 \begin{document}
 
@@ -66,7 +66,8 @@ and how the steps are applied.
 For many years, proof assistants were a niche, unpopular family of tools, used
 mostly by experts and enthusiasts. However, one member of that family in
 particular has been gaining traction in the mathematical community, bringing
-many inexperienced users to the world of interactive theorem proving.
+many inexperienced users to this world of expert-made, technical and rigorous
+proofs.
 
 \lean (\todo{cite?}) is an interactive proof assistant geared towards a general
 math audience.
@@ -75,8 +76,8 @@ intuitive syntax.
 For example, it has a large library of formalized mathematics called
 \mathlib, which contains many foundational and advanced mathematical
 results and theories, and includes notation familiar to mathematicians.
-Despite that, there are some challenging aspects of adopting \lean, and one in
-particular is how complex its semantics and type system are.
+Despite that, there are some challenges in adopting \lean. One challenge in
+particular, is how complex \lean's semantics and type system are.
 
 \section{Existing Solutions}
 When first wanting to formalize a proof in \lean, one usually takes human
@@ -114,6 +115,9 @@ is \waterproof. This is a library for the \rocq proof assistant, which adds
 notation inspired by pen-and-paper proofs.
 An example proof, written with and without \waterproof respectively, can be seen
 in figures \ref{fig:waterproof} and \ref{fig:no-waterproof}.
+It does require the proof to be
+fully formalized, and informal proofs would require major work to be adapted to
+\waterproof.
 
 \begin{figure}
 \include{rocq-waterproof-example}
@@ -126,12 +130,6 @@ in figures \ref{fig:waterproof} and \ref{fig:no-waterproof}.
 \caption{The same proof, written in \rocq without \waterproof.}
 \label{fig:no-waterproof}
 \end{figure}
-
-% TODO: Move the includes above to figures.
-
-It does require the proof to be
-fully formalized, and informal proofs would require major work to be adapted to
-\waterproof.
 
 \todo{Mention open ai’s paper that adi sent}
 
@@ -149,32 +147,30 @@ This workflow is in accordance to how researchers tend to use \lean, as a formal
 proof in \lean often comes as a supplementary part of a paper proof inside a
 research paper.
 
-\paragraph{Example}
-For example, for the following markdown document:
-{\small\begin{verbatim}
-Let $H = \{ \{ (x, y), (x + 1, y) \} \mid x \in 0..8, y \in
-0..9 \} \}$ be the set of horizontal tiles on the board.
-\end{verbatim}}
-The tool generates the following \lean code:
-\begin{leancode}
-    def H : Set (Fin 10 $\times$ Fin 10) := \{ (x, y) | (x $\in$ Finset.range 9) (y $\in$ Finset.range 10) \}
-\end{leancode}
+\begin{figure}
+    \include{example}
+    \caption{Markdown text, and \lean code that our tool generates}
+    \label{fig:example}
+\end{figure}
+
+One difference between our tool and other approaches, is that ours allows an
+informal proof that is only partially translated. By only aiming to extract as
+much information as we can from the user, without aiming for a complete
+rigorous proof, the tool can have less friction both in formalization and in
+notation.
+
 The tool is invoked by simply calling the macro \code{define\_latex file "foo.md"},
 with \code{foo.md} replaced with the file name of the markdown document of your
 choice. It is also possible to use the macro with a string literal instead of a
 file by omitting the "file" keyword: \code{define\_latex "Hello \$x=world\$"}.
 
-\section{Preliminary Work}
-As a case study, we started by taking a look at the following problem:
+See example in figure \ref{fig:example}.
 
-\begin{center}
-\fbox{
-    \parbox{0.7\textwidth}{
-        Can you cover a $10 \times 10$ board with $1 \times 2$ tiles, such that the
-        number of horizontal and vertical tiles is the same?
-    }
-}
-\end{center}
+\section{Preliminary Work}
+We started by using studying a use-case to see what are the important parts in
+formalization. Then we designed a tool to address those needs, and implemented a
+proof of concept. We are using a static analysis to choose between different
+possible representations.
 
 \begin{figure}
     % \centering
@@ -184,6 +180,19 @@ As a case study, we started by taking a look at the following problem:
     \caption{A proof sketch of the problem.}
     \label{fig:conjectures}
 \end{figure}
+
+\paragraph{Case Study}
+The choose the following problem as our subject for the initial exploration of
+the design space:
+
+\begin{center}
+\fbox{
+    \parbox{0.7\textwidth}{
+        Can you cover a $10 \times 10$ board with $1 \times 2$ tiles, such that the
+        number of horizontal and vertical tiles is the same?
+    }
+}
+\end{center}
 
 As it turns out, you can't. One can prove that it is impossible. A short
 intuitive proof can be seen in figure \ref{fig:conjectures}.
@@ -202,12 +211,76 @@ As an example, here is a part of the proof that represents conjecture 3.
     split <;> simp
 \end{verbatim}
 
-One of the challenges in translating a proof to \lean is representation.
-It is often much more idiomatic to use one of many possible representations.
-For something that might fit as a set for a mathematician, in \lean it might be
-better use the \code{Set} type, or the \code{Finset}, or maybe represent it as a
-type, or even a predicate. The most idiomatic choice for representation depends
-on use.
+In general, most lemmas do not translate directly. Logical steps that most
+mathematicians see as obvious must be stated explicitly, via various different
+keywords and auxiliary lemmas.
+Many times, it is hard to find a way to translate the logical steps to \lean's
+keywords and \mathlib's lemmas, and there isn't a one to one correspondence.
+
+Another challenge, is the representation of constructs and various mathematical
+objects. Just in our example, there were various objects that are not obvious to
+state in a formal way: What is a board? What is a tile?
+For the proof in figure \ref{fig:conjectures}, we choose a specific
+representation based on sets.
+For \lean, that is not specific enough.
+One might interpret that as any of the following.
+
+\begin{leancode}
+def Domino (p1 p2 : Point) : Set Point := \{ p1, p2 \}
+
+def Domino (p1 p2 : Point) : Finset Point := \{ p1, p2 \}
+
+inductive Domino \\
+\tab | H (lft : Point) \\
+\tab | V (top : Point)
+
+structure Domino where \\
+\tab topLeft : Point \\
+\tab isHorizontal : Bool
+
+def Domino n m := \{ set // isDomino n m set \} \\
+where isDomino n m (set : Finset Point) := \\
+\tab ($\forall$ p1 p2, p1 $\in$ set $\to$ p2 $\in$ set $\to$ p1.distance p2 $\le$ 1) \\
+\tab $\land$ set.card = 2 \\
+\tab $\land$ ($\forall$ p $\in$ set, 0 $\le$ p.x < n $\land$ 0 $\le$ p.y < m)
+\end{leancode}
+
+Each of the above representations will have consequences on how the proof is
+structured, how hard it will be to formalize, and on the representation of all
+of the rest of the proof. The \code{Set} type is of sets, \code{Finset} is the
+type of finite sets. Even the difference between these two representations
+can affect the entire proof.
+
+\paragraph{The Tool}
+Our tool takes markdown file as input and outputs definitions directly into the
+environment of the lean file that calls it. When the macro is interpreted by the
+compiler, the tool reads the given input markdown and runs the following
+pipeline:
+
+\begin{enumerate}
+    \item Spanning - all math elements (delimited by \$ or by \$\$) from the
+        document are extracted.
+    \item Lexing - math elements are broken into lists of tokens.
+    \item Paring - each token list is parsed into an Ast based on a grammar for
+        the tool's language.
+    % \item Categorizing - Asts are analyzing
+    \item Analyzing - the Ast is translated into a datalog
+\end{enumerate}
+In the Lexing and Parsing stages, errors are ignored and their math elements are
+silently forgotten. This allows the user to write down formulas that will simply
+be ignored.
+
+| # | Stage         | Output        | Representation            | Extra Info   |
+| - | ------------- | ------------- | ------------------------- | ------------ |
+| 1 | Input         | Text          | Array (Array Char)        |              |
+| 2 | Spanning      | Inline Math   | Array (Kind ✗ Span)[^1]   |              |
+| 3 | Lexing        | Tokens        | Array (Kind ✗ List Token) |              |
+| 4 | Parsing       | Ast           | Array (Kind ✗ Formula)    |              |
+| 5 | Categorizing  | Category      | Array CategorizedFormula  |              |
+| 6 | Analysing     | Analysis      | Analysis ✗ Array ...      |              |
+| 7 | Translation   | Lean Commands | Array LeanCmd             |              |
+| 8 | Emitting      | Lean Commands | CommandElabM Unit         |              |
+
 
 As a proof of concept, we made a tool which compiles inline math in a markdown
 document to \lean code, and uses a static analysis of the document to determine
