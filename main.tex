@@ -177,12 +177,15 @@ possible representations.
     % This command centers, like \centering, but doesn't break when the figure
     % is wider than the text width.
     \makebox[\textwidth][c]{ \scalebox{0.9}{\input{conjectures}} }
-    \caption{A proof sketch of the problem.}
+    \vspace{1em}
+    \input{conjecture-3-in-lean}
+    \caption{Top - a proof sketch of the problem, below - a proof of proposition
+    3 from the table.}
     \label{fig:conjectures}
 \end{figure}
 
 \paragraph{Case Study}
-The choose the following problem as our subject for the initial exploration of
+We choose the following problem as our subject for the initial exploration of
 the design space:
 
 \begin{center}
@@ -198,18 +201,8 @@ As it turns out, you can't. One can prove that it is impossible. A short
 intuitive proof can be seen in figure \ref{fig:conjectures}.
 While this proof is readable and correct, and even relatively formal, it does
 not translate well to \lean.
-As an example, here is a part of the proof that represents conjecture 3.
-
-\begin{verbatim}
-  lemma disjoint_hvtiles (tiling : DominoTiling n m) :
-    Disjoint (htiles tiling) (vtiles tiling) := by
-    unfold htiles vtiles
-    apply Finset.disjoint_filter_filter'
-    apply Pi.disjoint_iff.mpr
-    intros
-    unfold horizontal vertical
-    split <;> simp
-\end{verbatim}
+As an example, the figure includes a proof of proposition 3, which states that
+the horizontal and vertical tiles of the tiling are disjoint.
 
 In general, most lemmas do not translate directly. Logical steps that most
 mathematicians see as obvious must be stated explicitly, via various different
@@ -217,77 +210,62 @@ keywords and auxiliary lemmas.
 Many times, it is hard to find a way to translate the logical steps to \lean's
 keywords and \mathlib's lemmas, and there isn't a one to one correspondence.
 
+\begin{figure}
+    \include{domino-definitions}
+    \vspace{-2em}
+    \caption{Some possible representations of a domino.}
+    \label{fig:domino-definitions}
+\end{figure}
+
 Another challenge, is the representation of constructs and various mathematical
 objects. Just in our example, there were various objects that are not obvious to
 state in a formal way: What is a board? What is a tile?
-For the proof in figure \ref{fig:conjectures}, we choose a specific
+In the proof in figure \ref{fig:conjectures}, we choose a specific
 representation based on sets.
-For \lean, that is not specific enough.
+But even that is not specific enough to have a single translation to \lean.
 One might interpret that as any of the following.
+Some examples are in figure \ref{fig:domino-definitions}.
 
-\begin{leancode}
-def Domino (p1 p2 : Point) : Set Point := \{ p1, p2 \}
-
-def Domino (p1 p2 : Point) : Finset Point := \{ p1, p2 \}
-
-inductive Domino \\
-\tab | H (lft : Point) \\
-\tab | V (top : Point)
-
-structure Domino where \\
-\tab topLeft : Point \\
-\tab isHorizontal : Bool
-
-def Domino n m := \{ set // isDomino n m set \} \\
-where isDomino n m (set : Finset Point) := \\
-\tab ($\forall$ p1 p2, p1 $\in$ set $\to$ p2 $\in$ set $\to$ p1.distance p2 $\le$ 1) \\
-\tab $\land$ set.card = 2 \\
-\tab $\land$ ($\forall$ p $\in$ set, 0 $\le$ p.x < n $\land$ 0 $\le$ p.y < m)
-\end{leancode}
-
-Each of the above representations will have consequences on how the proof is
-structured, how hard it will be to formalize, and on the representation of all
-of the rest of the proof. The \code{Set} type is of sets, \code{Finset} is the
+Each representation has consequences on how the proof is
+structured, how hard it will be to formalize, and on the representation of the
+rest of the proof. The \code{Set} type is of sets, \code{Finset} is the
 type of finite sets. Even the difference between these two representations
 can affect the entire proof.
 
 \paragraph{The Tool}
-Our tool takes markdown file as input and outputs definitions directly into the
-environment of the lean file that calls it. When the macro is interpreted by the
-compiler, the tool reads the given input markdown and runs the following
-pipeline:
+Our tool takes a markdown file as input and emits definitions directly into
+the environment of the lean file that calls it.
+It is used by calling the macro \code{define\_latex file "foo.md"}, with the
+name of the file instead of \code{foo.md}.
+Upon the compiler encountering this macro, it reads the given file and run the
+following pipeline:
 
 \begin{enumerate}
-    \item Spanning - all math elements (delimited by \$ or by \$\$) from the
+    \item Spanning - all math elements (delimited by "\$" or by "\$\$") from the
         document are extracted.
     \item Lexing - math elements are broken into lists of tokens.
     \item Paring - each token list is parsed into an Ast based on a grammar for
         the tool's language.
     % \item Categorizing - Asts are analyzing
-    \item Analyzing - the Ast is translated into a datalog
+    \item Analyzing - the Ast is translated into a Datalog representation, and a
+        static analysis is run on it. More on this later.
+    \item Translating - the Ast is translated into \lean code and added to the
+        files environment via the meta-programming API. More on this later.
 \end{enumerate}
+
 In the Lexing and Parsing stages, errors are ignored and their math elements are
 silently forgotten. This allows the user to write down formulas that will simply
-be ignored.
+be ignored. Ignored errors can optionally be reported as warnings, controlled
+via a flag.
 
-| # | Stage         | Output        | Representation            | Extra Info   |
-| - | ------------- | ------------- | ------------------------- | ------------ |
-| 1 | Input         | Text          | Array (Array Char)        |              |
-| 2 | Spanning      | Inline Math   | Array (Kind ✗ Span)[^1]   |              |
-| 3 | Lexing        | Tokens        | Array (Kind ✗ List Token) |              |
-| 4 | Parsing       | Ast           | Array (Kind ✗ Formula)    |              |
-| 5 | Categorizing  | Category      | Array CategorizedFormula  |              |
-| 6 | Analysing     | Analysis      | Analysis ✗ Array ...      |              |
-| 7 | Translation   | Lean Commands | Array LeanCmd             |              |
-| 8 | Emitting      | Lean Commands | CommandElabM Unit         |              |
+For now, the tool is only a proof of concept, and does not choose between many
+different representations. The choice it makes is between 2 different
+representations of sets. Sets can be represented as \code{Set} or \code{Finset}.
+Other mathematical objects such as quantified formulas, tuples, multi-sets, and
+numbers are supported as well, but have only one representation each.
 
-
-As a proof of concept, we made a tool which compiles inline math in a markdown
-document to \lean code, and uses a static analysis of the document to determine
-which representation to use for each mathematical object.
-You can invoke the tool interactively inside a \lean document, giving it a
-markdown document, and it declares variables and definitions which can be used
-from that point on as if they were declared in the file itself directly.
+\paragraph{Static Analysis}
+The static analysis 
 
 The tool we have right now is very basic, and the only possible representations
 are \code{Set} or \code{Finset} for sets, and \code{Multiset} for multisets and

@@ -1,0 +1,19 @@
+\begin{leancode}
+def Domino (p1 p2 : Point) : Set Point := \{ p1, p2 \}
+
+def Domino (p1 p2 : Point) : Finset Point := \{ p1, p2 \}
+
+inductive Domino \\
+\tab | H (lft : Point) \\
+\tab | V (top : Point)
+
+structure Domino where \\
+\tab topLeft : Point \\
+\tab isHorizontal : Bool
+
+def Domino n m := \{ set // isDomino n m set \} \\
+where isDomino n m (set : Finset Point) := \\
+\tab ($\forall$ p1 p2, p1 $\in$ set $\to$ p2 $\in$ set $\to$ p1.distance p2 $\le$ 1) \\
+\tab $\land$ set.card = 2 \\
+\tab $\land$ ($\forall$ p $\in$ set, 0 $\le$ p.x < n $\land$ 0 $\le$ p.y < m)
+\end{leancode}

@@ -1,0 +1,10 @@
+\begin{leancode}
+lemma disjoint\_hvtiles (tiling : DominoTiling n m) : \\
+\tab Disjoint (htiles tiling) (vtiles tiling) := by \\
+\tab unfold htiles vtiles \\
+\tab apply Finset.disjoint\_filter\_filter' \\
+\tab apply Pi.disjoint\_iff.mpr \\
+\tab intros \\
+\tab unfold horizontal vertical \\
+\tab split <;> simp \\
+\end{leancode}
