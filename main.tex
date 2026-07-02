@@ -1,6 +1,7 @@
 \documentclass{article}
 
 % ------ Packages ------
+\usepackage[sort,numbers]{natbib}
 \usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage{graphicx}
@@ -69,7 +70,7 @@ particular has been gaining traction in the mathematical community, bringing
 many inexperienced users to this world of expert-made, technical and rigorous
 proofs.
 
-\lean (\todo{cite?}) is an interactive proof assistant geared towards a general
+\lean \cite{10.1007/978-3-030-79876-5_37} is an interactive proof assistant geared towards a general
 math audience.
 Two things that make it especially appealing are its large ecosystem and its
 intuitive syntax.
@@ -247,10 +248,10 @@ following pipeline:
     \item Paring - each token list is parsed into an Ast based on a grammar for
         the tool's language.
     % \item Categorizing - Asts are analyzing
-    \item Analyzing - the Ast is translated into a Datalog representation, and a
-        static analysis is run on it. More on this later.
-    \item Translating - the Ast is translated into \lean code and added to the
-        files environment via the meta-programming API. More on this later.
+    \item Analyzing - the static analysis is run on the Ast (more on this later).
+    \item Translating - a representation is chosen according to the analysis,
+        and the Ast is translated and added to the file's environment (more on
+        this later).
 \end{enumerate}
 
 In the Lexing and Parsing stages, errors are ignored and their math elements are
@@ -265,13 +266,46 @@ Other mathematical objects such as quantified formulas, tuples, multi-sets, and
 numbers are supported as well, but have only one representation each.
 
 \paragraph{Static Analysis}
-The static analysis 
+The static analysis is written in a language called Souffle \todo{cite}.
+It is a Datalog dialect made for static analysis.
 
-The tool we have right now is very basic, and the only possible representations
-are \code{Set} or \code{Finset} for sets, and \code{Multiset} for multisets and
-\code{Prod} for tuples.
+Every expression involving a set may be tagged.
+Expressions that produce finite sets are tagged as "finite", and that tag is
+propagated from children to parents when correct.
+When a set expression is used in a cardinality expression ($\abs{S}$), it is
+tagged as "must-be-finite". That tag is propagated from parents to children when
+needed.
 
-\section{References}
+\paragraph{Translation}
+The translation is not done directly to \lean syntax as strings.
+Instead, the tool uses \lean's meta-programming API to construct \lean
+expressions and interact with the file's environment.
+
+The tool currently decides to represent sets as \code{Finset} if and when they
+are tagged as "must-be-finite".
+When a set is tagged as "must-be-finite" but is not tagged as "finite" the tool
+emits a warning.
+
+\section{Future Work}
+The natural next step is to expand the tool to support more representations,
+include support for more syntax.
+In most contexts, there is more than one way representation for a given
+definition, but one might be better fit. Heuristics or machine learning can be
+used to decide which representations to use, or allow the user to see view the
+options and decide.
+
+The language could also be integrated with solvers in many ways.
+We have explored an idea of using an SMT solver to find contradictions in a
+proof as the user writes it, and suggest fixes.
+
+While the tool currently only defines definitions, it can be expanded to define
+theorems and proofs as well, using holes. The tool can translate a proof sketch
+that would include different steps of the proof, as well as lemmas and
+additional theorems, and whatever part of the proof is missing can be left as a
+hole to be filled by the user.
+
+\bibliographystyle{plainnat}
+\bibliography{bib}
 
 \end{document}
 
