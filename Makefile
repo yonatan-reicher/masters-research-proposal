@@ -7,3 +7,8 @@ main.pdf : $(ltx_files)
 	bibtex main
 	$(LATEX) main.tex
 	$(LATEX) main.tex
+
+.PHONY: clean
+clean:
+	rm -f *.aux *.bbl *.blg *.log *.out *.toc *.lof *.lot
+	rm -f main.pdf
