@@ -41,8 +41,12 @@
 \newname{\rocq}{Rocq}
 \newname{\waterproof}{Waterproof}
 
+\makeatletter
 \let\oldsection\section
-\renewcommand{\section}[1]{\oldsection*{\large#1}\vspace{-0.5em}}
+\renewcommand{\section}{\@ifstar\customsectionstar\customsectionnostar}
+\newcommand{\customsectionstar}[1]{\oldsection*{\large#1}\vspace{-0.5em}}
+\newcommand{\customsectionnostar}[1]{\oldsection*{\large#1}\vspace{-0.5em}}
+\makeatother
 
 \begin{document}
 
@@ -89,7 +93,9 @@ learn the basics.
 
 A more automated approach is to formalize just the theorems and definitions, and
 then use an automated theorem prover to fill in the gaps. Several such tools
-exist, such as \aesop, \grind, and \leanegg (\todo{cite..?}).
+exist, such as \aesop \cite{limperg_2022_7430233}, \leanegg
+\cite{10.1145/3776667}
+and even a builtin tool called \grind.
 These tools complete a theorem, or part of a theorem, using various heuristics
 and algorithms.
 They tend to be integrated into \lean, and more fit to use as part of
@@ -105,7 +111,7 @@ One can write their paper, provide it to the agent, and prompt it to generate a
 formal \lean proof.
 One can even interact with it to steer towards better directions.
 There are even tools in place to help large language models work with \lean such
-\aristotle (\todo{cite?}).
+\aristotle \cite{achim2025aristotleimolevelautomatedtheorem}.
 These systems suffer a number of drawbacks. To name a few:
 They lack reproducibility,
 are usually based on cloud services,
@@ -131,8 +137,6 @@ fully formalized, and informal proofs would require major work to be adapted to
 \caption{The same proof, written in \rocq without \waterproof.}
 \label{fig:no-waterproof}
 \end{figure}
-
-\todo{Mention open ai’s paper that adi sent}
 
 \section{Our Approach}
 We define a language for writing \emph{informal} proofs that can be partially
@@ -266,7 +270,7 @@ Other mathematical objects such as quantified formulas, tuples, multi-sets, and
 numbers are supported as well, but have only one representation each.
 
 \paragraph{Static Analysis}
-The static analysis is written in a language called Souffle \todo{cite}.
+The static analysis is written in a language called Souffle \cite{Jordan2016SoufflOS}.
 It is a Datalog dialect made for static analysis.
 
 Every expression involving a set may be tagged.
@@ -308,12 +312,3 @@ hole to be filled by the user.
 \bibliography{bib}
 
 \end{document}
-
-
-% TODO:
-% Expand preliminary work section
-% - write down a natlang explanation of the analysis and mention the word
-%   fixpoint static analysis
-% Future work
-% - more analysis
-% - something about RSK
